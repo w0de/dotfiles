@@ -56,15 +56,19 @@ Argument
   elif [[ "${cmd}" == "bot" ]] || [[ "${cmd}" == "computer" ]] || [[ "${cmd}" == "ai" ]]; then
     url_base="https://chat.openai.com/?q="
   elif [[ "${cmd}" == "py" ]]; then
-    http_dir="."
     url_base="http://localhost:8000/"
-    if ! test -z "${arg}" && test -f "${arg}"; then
+    if test -z "${arg}"; then
+      http_dir="."
+    elif test -f "${arg}"; then
       http_dir="$(dirname $arg)"
       url_path="$(basename $arg)"
+    elif test -d "${arg}"; then
+      http_dir="${arg}"
     fi
-
-    if screen -S "$scr_name" -L -d -m python -m http.server --directory "$http_dir"; then
+    
+    if screen -S "$scr_name" -L -d -m python3 -m http.server --directory "$http_dir"; then
       scr_sesh=true
+      sleep 3
     else
       echo "screen failed"
       pkill "screen"
