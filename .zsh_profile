@@ -40,6 +40,9 @@ Argument
   elif [[ "${cmd}" == "pulls" ]]; then
     cmd="repo"
     arg="pulls"
+  elif [[ "${cmd}" == "pr" ]] && ! test -z "${arg}"; then
+    cmd="repo"
+    arg="pull/${arg}"
   fi
   
   if ! test -z "${arg}"; then
@@ -74,6 +77,9 @@ Argument
       pkill "screen"
       exit 1
     fi
+  elif [[ "${cmd}" == "pr" ]]; then
+    gh pr create --fill
+    gh pr view --web
   else
     url_base="https://${cmd}/"
   fi
@@ -152,4 +158,7 @@ alias mip="git commit -m 'merge'"
 alias black="python3 -m black"
 alias ohmyzsh="mate ~/.oh-my-zsh"
 alias unixtime="date +'%s'"
+alias repo="http repo"
+alias pulls="http pulls"
+alias pr="http pr"
 

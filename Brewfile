@@ -1,0 +1,71 @@
+
+
+# gnu
+# Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
+brew "coreutils"
+brew "moreutils"
+brew "findutils"
+brew "gnu-sed"
+
+# macos
+brew "vim"
+brew "grep"
+brew "openssh"
+brew "screen"
+brew "php"
+brew "gmp"
+
+# helvetica
+tap "bramstein/webfonttools"
+brew "sfnt2woff"
+brew "sfnt2woff-zopfli"
+brew "woff2"
+
+# 1337
+brew "aircrack-ng"
+brew "bfg"
+brew "binutils"
+brew "binwalk"
+brew "cifer"
+brew "dex2jar"
+brew "dns2tcp"
+brew "fcrackzip"
+brew "foremost"
+brew "gnupg"
+brew "hashpump"
+brew "hydra"
+brew "john"
+brew "knock"
+brew "netpbm"
+brew "nmap"
+brew "pngcheck"
+brew "socat"
+brew "sqlmap"
+brew "tcpflow"
+brew "tcpreplay"
+brew "tcptrace"
+brew "ucspi-tcp" # `tcpserver` etc.
+brew "xpdf"
+brew "xz"
+
+# misc
+brew "ack"
+brew "exiv2"
+brew "gh"
+brew "git"
+brew "git-lfs"
+brew "gs"
+brew "imagemagick"
+brew "lua"
+brew "lynx"
+brew "p7zip"
+brew "pigz"
+brew "pv"
+brew "python@3.11"
+brew "python@3.13"
+brew "rename"
+brew "rlwrap"
+brew "ssh-copy-id"
+brew "tree"
+brew "vbindiff"
+brew "zopfli"
