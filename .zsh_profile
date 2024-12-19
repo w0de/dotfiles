@@ -1,0 +1,151 @@
+export PATH="$HOME/bin:/usr/local/bin:$PATH:/opt/homebrew/bin"
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell" # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+source $ZSH/oh-my-zsh.sh
+plugins=(git)
+
+export EDITOR="vi"
+export GOPATH="$HOME/gopath"
+
+if test -f ~/.nvmrc; then
+  source ~/.nvmrc
+fi
+
+if test -f ~/.localrc; then
+  source ~/.localrc
+fi
+
+function http {
+  use_help="http {COMMAND:repo,pulls,wat,ai,<url>} [ARGUMENT:<query>,<path>]\n  __\n"
+  cmd_help="repo|open current repo's gh remote\n  pulls|alias for 'http repo pulls'\n  wat|query duckduckgo\n  ai|query chatgpt (requires session)\n  py|serve local path with python\n  <url>|open with browser\n  help|this message\n  __\n"
+  arg_help="query|query for wat or ai cmd\n  path|path to append to url (eg 'pulls')\n  __\n"
+  all_help="
+Usage
+  $use_help
+Command
+  $cmd_help
+Argument
+  $arg_help
+  "
+  cmd="${1}"
+  arg="${2}"
+  url_base=""
+  url_path=""
+  scr_sesh=false
+  scr_name="http-func-screen-sesh"
+
+  if test -z "${cmd}"; then
+    cmd="help"
+  elif [[ "${cmd}" == "pulls" ]]; then
+    cmd="repo"
+    arg="pulls"
+  fi
+  
+  if ! test -z "${arg}"; then
+    url_path="${arg}"
+  fi
+
+  if [[ "${cmd}" == "help" ]]; then
+    echo -e "$all_help" | column -s "|" -t
+    exit 1
+  elif [[ "${cmd}" == "repo" ]]; then
+    url_base="$(git remote -v | grep origin | tail -1 | awk '{print $2}' | sed 's/.git//g' | awk -F ':' '{print "https://github.com/"$2}')/"
+  elif [[ "${cmd}" == "wat" ]]; then
+    url_base="https://duckduckgo.com/"
+  elif [[ "${cmd}" == "bot" ]] || [[ "${cmd}" == "computer" ]] || [[ "${cmd}" == "ai" ]]; then
+    url_base="https://chat.openai.com/?q="
+  elif [[ "${cmd}" == "py" ]]; then
+    http_dir="."
+    url_base="http://localhost:8000/"
+    if ! test -z "${arg}" && test -f "${arg}"; then
+      http_dir="$(dirname $arg)"
+      url_path="$(basename $arg)"
+    fi
+
+    if screen -S "$scr_name" -L -d -m python -m http.server --directory "$http_dir"; then
+      scr_sesh=true
+    else
+      echo "screen failed"
+      pkill "screen"
+      exit 1
+    fi
+  else
+    url_base="https://${cmd}/"
+  fi
+  
+  url="${url_base}${url_path}"
+  echo "--> ${url}"
+  /usr/bin/open "${url}"
+  
+  if $scr_sesh; then
+    echo "attaching python server screen session..."
+    if ! screen -A -d -r "$scr_name"; then
+        echo "Error: screen session failed to start!"
+        cat screenlog.0
+        rm -f "screenlog.*"
+        exit 1
+    fi
+    rm -f "screenlog.*"
+    pkill screen
+    exit 0
+  fi
+}
+
+function venvter {
+  venvf=".venv/bin/activate"
+  msg="type source loaded?\n---- ------ -------"
+  msg="$msg\nvenv ${venvf}"
+  if source $venvf &> /dev/null; then
+    msg="$msg ✅"
+  else
+    msg="$msg ❌"
+  fi
+
+  if test -z "$1"; then
+    envf=""
+  else
+    envf="${1}"
+  fi
+
+  if test -z $envf || ! test -f $envf; then
+    envf="${envf}.env"
+  fi
+
+  msg="$msg\n.env $envf"
+  if source $envf &> /dev/null; then
+    msg="$msg ✅"
+  else
+    msg="$msg ❌"
+  fi
+
+  echo -e "$msg" | column -t
+}
+
+ssh_port_forward() {
+    # Usage: ssh_port_forward [port] [intermediate_host] [target_host]
+
+    # Assign arguments to variables
+    PORT=$1
+    INTERMEDIATE_HOST=$2
+    TARGET_HOST=$3
+
+    # Check if all arguments are provided
+    if [ -z "$PORT" ] || [ -z "$INTERMEDIATE_HOST" ] || [ -z "$TARGET_HOST" ]; then
+        echo "Usage: ssh_port_forward [port] [intermediate_host] [target_host]"
+        return 1
+    fi
+
+    # SSH command with port forwarding
+    ssh -L ${PORT}:localhost:${PORT} ${INTERMEDIATE_HOST} ssh -L ${PORT}:localhost:${PORT} ${TARGET_HOST}
+}
+
+alias wip="git commit -m 'wip'"
+alias wipush="wip && git push"
+alias wippit="git add . && wipush"
+alias venv="rm -rf .venv; mkdir .venv && virtualenv -p $(which python3.11) .venv && venvter"
+alias mip="git commit -m 'merge'"
+alias black="python3 -m black"
+alias ohmyzsh="mate ~/.oh-my-zsh"
+alias unixtime="date +'%s'"
+
