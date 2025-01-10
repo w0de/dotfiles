@@ -51,7 +51,7 @@ Argument
 
   if [[ "${cmd}" == "help" ]]; then
     echo -e "$all_help" | column -s "|" -t
-    exit 1
+    return 1
   elif [[ "${cmd}" == "repo" ]]; then
     url_base="$(git remote -v | grep origin | tail -1 | awk '{print $2}' | sed 's/.git//g' | awk -F ':' '{print "https://github.com/"$2}')/"
   elif [[ "${cmd}" == "wat" ]]; then
@@ -75,7 +75,7 @@ Argument
     else
       echo "screen failed"
       pkill "screen"
-      exit 1
+      return 1
     fi
   elif [[ "${cmd}" == "pr" ]]; then
     gh pr create --fill
@@ -94,11 +94,11 @@ Argument
         echo "Error: screen session failed to start!"
         cat screenlog.0
         rm -f "screenlog.*"
-        exit 1
+        return 1
     fi
     rm -f "screenlog.*"
     pkill screen
-    exit 0
+    return 0
   fi
 }
 
@@ -133,23 +133,69 @@ function venvter {
 }
 
 ssh_port_forward() {
-    # Usage: ssh_port_forward [port] [intermediate_host] [target_host]
+  # Usage: ssh_port_forward [port] [intermediate_host] [target_host]
 
-    # Assign arguments to variables
-    PORT=$1
-    INTERMEDIATE_HOST=$2
-    TARGET_HOST=$3
+  # Assign arguments to variables
+  PORT=$1
+  INTERMEDIATE_HOST=$2
+  TARGET_HOST=$3
 
-    # Check if all arguments are provided
-    if [ -z "$PORT" ] || [ -z "$INTERMEDIATE_HOST" ] || [ -z "$TARGET_HOST" ]; then
-        echo "Usage: ssh_port_forward [port] [intermediate_host] [target_host]"
-        return 1
-    fi
+  # Check if all arguments are provided
+  if [ -z "$PORT" ] || [ -z "$INTERMEDIATE_HOST" ] || [ -z "$TARGET_HOST" ]; then
+      echo "Usage: ssh_port_forward [port] [intermediate_host] [target_host]"
+      return 1
+  fi
 
-    # SSH command with port forwarding
-    ssh -L ${PORT}:localhost:${PORT} ${INTERMEDIATE_HOST} ssh -L ${PORT}:localhost:${PORT} ${TARGET_HOST}
+  # SSH command with port forwarding
+  ssh -L ${PORT}:localhost:${PORT} ${INTERMEDIATE_HOST} ssh -L ${PORT}:localhost:${PORT} ${TARGET_HOST}
 }
 
+melatonin() {
+  pid=
+  screen -S "melatonin" -L -d -m caffeinate -d -w $pid
+  rm -f screenlog.*
+}
+
+decaffeinate() {
+  if pgrep -i caffeinate; then
+    pkill -i caffeinate || sudo pkill -i caffeinate
+  fi
+}
+
+χασίσι() {
+  if test -z $3; then
+    t=$3
+  else
+    t=5
+  fi
+
+  case "$1" in
+    as)
+      caffeinate -uid "$2" -t $t
+      ;;
+    til)
+      pid=$(pgrep -u $(id -u) -o -x -i "$2")
+      caffeinate -uid -w $pid -t $t
+      ;;
+    *)
+      rm -rf $HOME/.pwr && mkdir $HOME/.pwr || mkdir $HOME/.pwr
+      echo -e "#!/bin/bash\nwhile true; do echo '' && cat ~/.hitchhikerrc | jq '.[] | .quote' | shuf -n 39 | head -1 | tr -d '\"' | cowsay -r -C && sleep 92 || exit 1; done\n" > $HOME/.pwr/icu.creepin
+      chmod +x $HOME/.pwr/icu.creepin
+      caffeinate -uid "$HOME/.pwr/icu.creepin"
+      ;;
+  esac
+}
+
+psaux() {
+  if test -z $1; then
+    ps aux
+  elif [[ "$1" == "grep" ]]; then
+    ps aux | grep -i "$1"
+  else
+    ps aux | grep -i "$1" | grep -v grep
+  fi
+}
+    
 alias wip="git commit -m 'wip'"
 alias wipush="wip && git push"
 alias wippit="git add . && wipush"
@@ -161,4 +207,5 @@ alias unixtime="date +'%s'"
 alias repo="http repo"
 alias pulls="http pulls"
 alias pr="http pr"
-
+alias last="echo $?"
+alias x=χασίσι
