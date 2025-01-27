@@ -163,19 +163,13 @@ decaffeinate() {
 }
 
 χασίσι() {
-  if test -z $3; then
-    t=$3
-  else
-    t=5
-  fi
-
   case "$1" in
     as)
-      caffeinate -uid "$2" -t $t
+      caffeinate -uid "$2"
       ;;
     til)
       pid=$(pgrep -u $(id -u) -o -x -i "$2")
-      caffeinate -uid -w $pid -t $t
+      caffeinate -uid -w $pid
       ;;
     *)
       rm -rf $HOME/.pwr && mkdir $HOME/.pwr || mkdir $HOME/.pwr
@@ -209,3 +203,4 @@ alias pulls="http pulls"
 alias pr="http pr"
 alias last="echo $?"
 alias x=χασίσι
+alias myip="curl -H 'Accept: application/json' ipinfo.io"
