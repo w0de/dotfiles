@@ -173,7 +173,7 @@ decaffeinate() {
       ;;
     *)
       rm -rf $HOME/.pwr && mkdir $HOME/.pwr || mkdir $HOME/.pwr
-      echo -e "#!/bin/bash\nwhile true; do echo '' && jq -r '.[] | .quote, .person' ~/.quotes.json | shuf -n 39 | head -2 | tr -d '\"' | cowsay -r -C -y && sleep 92 || exit 1; done\n" > $HOME/.pwr/icu.creepin
+      cat $HOME/.quotesrc > $HOME/.pwr/icu.creepin
       chmod +x $HOME/.pwr/icu.creepin
       caffeinate -uid "$HOME/.pwr/icu.creepin"
       ;;
