@@ -5,5 +5,5 @@ indices=$(($(grep -c '"quote":' ~/.quotes.json)-1))
 while true; do
     i=$(shuf -i 0-$indices -n 1)
     q=$(jq -r ".[${i}] | .quote" ~/.quotes.json)
-    echo "" && cowsay -r -C -y -W $(($(tput cols)-8)) """    $q""" && sleep 92 || exit 1
+    echo -e "\n\n\n\n" && cowsay -r -C -y -W $(($(tput cols)-8)) """    $q""" && sleep 92 || exit 1
 done
