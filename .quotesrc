@@ -4,5 +4,6 @@ quotes[1]="$HOME/.shevekrc"
 size=${#quotes[@]}
 
 while true; do
-    echo '' && cat ${quotes[$(($RANDOM % $size))]} | jq '.[] | .quote' | shuf -n 39 | head -1 | tr -d '\"' | cowsay -r -C && sleep 92 || exit 1
+    i=$(($RANDOM % $size))
+    echo '' && jq '.[] | .quote' ${quotes[$i]} | shuf -n 39 | head -1 | tr -d '\"' | cowsay -r -C && sleep 92 || exit 1
 done
